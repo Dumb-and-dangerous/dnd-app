@@ -21,7 +21,15 @@
   ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "typescript.preferences.importModuleSpecifier": "shortest",
-  "cSpell.words": ["nodemodules", "stylelint", "testid", "vercel"],
+  "cSpell.words": [
+    "chakra",
+    "esnext",
+    "nodemodules",
+    "tailwindcss",
+    "testid",
+    "trivago",
+    "vercel"
+  ],
   "[css]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
