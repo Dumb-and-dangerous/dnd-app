@@ -1,5 +1,8 @@
 # Getting started with Dumbs & Dangerous App :game_die:
 
+- Master: https://dumb-and-dangerous.vercel.app/
+- Develop: https://dev.dumb-and-dangerous.vercel.app/
+
 ## Features
 
 **TODO**: Add libraries when they are fully integrated
