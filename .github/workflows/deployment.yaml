@@ -1,0 +1,68 @@
+name: Deployment
+run-name: 'Deploy branch: ${{ github.ref }} to env: ${{ inputs.environment }} on domain: ${{ inputs.domain }}'
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Commit Ref (Optional)
+        required: false
+      environment:
+        description: Environment variables
+        required: true
+        default: develop
+        type: environment
+      domain:
+        description: Domain <should be `${env}` (dev. or nothing)> (Optional)
+        type: string
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      domain:
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: ${{ inputs.environment }}
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - name: Clone Repository (Last commit)
+        uses: actions/checkout@v3
+        if: github.event.inputs.git-ref == ''
+
+      - name: Clone Repository (Custom commit)
+        uses: actions/checkout@v3
+        if: github.event.inputs.git-ref != ''
+        with:
+          ref: ${{ github.event.inputs.git-ref }}
+
+      - name: Deploy to Vercel Action
+        id: deploy-vercel
+        uses: BetaHuhn/deploy-to-vercel-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_SCOPE: ${{ secrets.VERCEL_TEAM_NAME }}
+          PRODUCTION: ${{ inputs.environment }} == 'production'
+          BUILD_ENV: |
+            SHOW_ENV=${{ vars.SHOW_ENV }}
+            BASE_URL=${{ secrets.BASE_URL }}
+          ALIAS_DOMAINS: |
+            https://${{ inputs.domain }}${{ vars.APP_DOMAIN }}
+
+      - name: Health check the deployed service URL
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: ${{steps.deploy-vercel.outputs.PREVIEW_URL}}
+          follow-redirect: false
+          max-attempts: 3
+          retry-delay: 5s
+          retry-all: false
