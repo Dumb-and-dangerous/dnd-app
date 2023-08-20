@@ -12,6 +12,10 @@
 - Commits messages should follow this example: `DND: Initial commit`
   - Prefix: `DND`
   - The message should always start the first letter with Capital letters.
+- Branches
+  - feature/DND-X-short-name-with-lower-case-letters
+  - bugfix/DND-X-short-name-with-lower-case-letters
+  - hotfix/DND-X-short-name-with-lower-case-letters (Checkout from master and merge to master)
 
 ## Set up environment
 
