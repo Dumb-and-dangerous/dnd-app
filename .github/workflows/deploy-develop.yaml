@@ -14,7 +14,7 @@ jobs:
     uses: ./.github/workflows/tests.yaml
   deploy-develop:
     uses: ./.github/workflows/deployment.yaml
-    needs: [tests]
+    needs: [check-and-test]
     secrets: inherit
     with:
       environment: develop
