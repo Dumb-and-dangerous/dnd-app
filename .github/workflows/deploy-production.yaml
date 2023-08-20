@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  deploy-production:
     uses: ./.github/workflows/deployment.yaml
     secrets: inherit
     with:

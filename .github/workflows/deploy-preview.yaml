@@ -10,9 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  tests:
+  check-and-test:
     uses: ./.github/workflows/tests.yaml
-  deploy:
+  deploy-brach-preview:
     uses: ./.github/workflows/deployment.yaml
     needs: [tests]
     secrets: inherit
