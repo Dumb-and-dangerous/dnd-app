@@ -1,0 +1,18 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-production:
+    uses: ./.github/workflows/deployment.yaml
+    secrets: inherit
+    with:
+      environment: production
+

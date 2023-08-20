@@ -1,0 +1,22 @@
+name: Deploy Develop
+
+on:
+  push:
+    branches:
+      - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-and-test:
+    uses: ./.github/workflows/tests.yaml
+  deploy-develop:
+    uses: ./.github/workflows/deployment.yaml
+    needs: [check-and-test]
+    secrets: inherit
+    with:
+      environment: develop
+      domain: dev.
+

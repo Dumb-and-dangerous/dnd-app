@@ -1,0 +1,21 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    branches: [develop]
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-and-test:
+    uses: ./.github/workflows/tests.yaml
+  deploy-brach-preview:
+    uses: ./.github/workflows/deployment.yaml
+    needs: [check-and-test]
+    secrets: inherit
+    with:
+      environment: develop
+
