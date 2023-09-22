@@ -11,14 +11,15 @@
     "lint:fix": "next lint --fix && yarn format",
     "type-check": "tsc --noEmit --skipLibCheck",
     "pre-commit": "npm run type-check && npm run lint",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@chakra-ui/next-js": "^2.1.5",
     "@chakra-ui/react": "^2.8.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@types/node": "20.4.9",
     "@types/react": "18.2.19",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.14",
@@ -35,10 +36,21 @@
     "typescript": "5.1.6"
   },
   "devDependencies": {
+    "@chakra-ui/storybook-addon": "^5.0.1",
+    "@storybook/addon-essentials": "^7.4.4",
+    "@storybook/addon-interactions": "^7.4.4",
+    "@storybook/addon-links": "^7.4.4",
+    "@storybook/blocks": "^7.4.4",
+    "@storybook/nextjs": "^7.4.4",
+    "@storybook/react": "^7.4.4",
+    "@storybook/testing-library": "^0.2.1",
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
+    "@types/node": "^20.6.3",
     "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-storybook": "^0.6.14",
     "husky": "^8.0.0",
     "prettier": "^3.0.1",
-    "prettier-plugin-tailwindcss": "^0.4.1"
+    "prettier-plugin-tailwindcss": "^0.4.1",
+    "storybook": "^7.4.4"
   }
 }
