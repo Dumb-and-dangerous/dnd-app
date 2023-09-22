@@ -6,24 +6,14 @@ import { useForm } from 'react-hook-form';
 import SignInGoogleButton from '@/components/ui/buttons/sign-in-google';
 import ControlledInput from '@/components/ui/inputs/controlled';
 
-import { LoginFormType } from './types';
+import { LoginFormProps, LoginInputs } from './types';
 
-// TO-DO: Remove this when full integrated
-function onSubmit(values: any) {
-  return new Promise((resolve: any) => {
-    setTimeout(() => {
-      alert(JSON.stringify(values, null, 2));
-      resolve();
-    }, 3000);
-  });
-}
-
-export default function LoginForm() {
+export default function LoginForm({ onSubmit }: LoginFormProps) {
   const {
     handleSubmit,
     control,
     formState: { isSubmitting },
-  } = useForm<LoginFormType>();
+  } = useForm<LoginInputs>();
 
   return (
     <form className='space-y-4' onSubmit={handleSubmit(onSubmit)}>
@@ -36,4 +26,3 @@ export default function LoginForm() {
     </form>
   );
 }
-
