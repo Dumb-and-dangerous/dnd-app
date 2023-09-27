@@ -13,12 +13,27 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
     handleSubmit,
     control,
     formState: { isSubmitting },
-  } = useForm<LoginInputs>();
+  } = useForm<LoginInputs>({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
   return (
     <form className='space-y-4' onSubmit={handleSubmit(onSubmit)}>
-      <ControlledInput control={control} name='email' label='Email' />
-      <ControlledInput control={control} name='password' label='Password' />
+      <ControlledInput
+        control={control}
+        name='email'
+        label='Email'
+        rules={{ required: 'This field is required' }}
+      />
+      <ControlledInput
+        control={control}
+        name='password'
+        label='Password'
+        rules={{ required: 'This field is required' }}
+      />
       <Button w='full' isLoading={isSubmitting} type='submit'>
         Submit
       </Button>
