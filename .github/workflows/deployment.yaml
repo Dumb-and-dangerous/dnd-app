@@ -55,8 +55,8 @@ jobs:
           BUILD_ENV: |
             SHOW_ENV=${{ vars.SHOW_ENV }}
             BASE_URL=${{ secrets.BASE_URL }}
-          ALIAS_DOMAINS: |
-            https://${{ inputs.domain }}${{ vars.APP_DOMAIN }}
+          PR_PREVIEW_DOMAIN: 'app-{REPO}-{PR}.${{ vars.APP_DOMAIN }}'
+          ALIAS_DOMAINS: https://${{ inputs.domain }}${{ vars.APP_DOMAIN }}
 
       - name: Health check the deployed service URL
         uses: jtalk/url-health-check-action@v3
