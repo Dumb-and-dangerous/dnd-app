@@ -1,0 +1,70 @@
+name: Deploy storybook
+
+on:
+  workflow_call:
+    inputs:
+      isPreview:
+        required: false
+        type: boolean
+        default: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+        if: github.event.inputs.git-ref == ''
+
+      - name: Get changed files in the docs folder
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v39
+        with:
+          files: src/**/*.stories.{js,jsx,mjs,ts,tsx}
+
+      - name: Create vercel storybook file
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        run: |
+          touch vercel.json
+          echo | {
+            "$schema": "https://openapi.vercel.sh/vercel.json",
+            "buildCommand": "npm run build-storybook",
+            "devCommand": "npm run storybook",
+            "installCommand": "npm install",
+            "framework": null,
+            "outputDirectory": "./storybook-static"
+          } >> vercel.json
+
+          echo "cat vercel.json"
+          cat vercel.json
+
+          echo "ls -a ."
+          ls -a .
+
+          echo "ls ${{ github.workspace }}"
+          ls ${{ github.workspace }}
+
+      - name: Deploy to Vercel Action
+        id: deploy-vercel
+        uses: BetaHuhn/deploy-to-vercel-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_SCOPE: ${{ secrets.VERCEL_TEAM_NAME }}
+          PRODUCTION: false
+          BUILD_ENV: |
+            SHOW_ENV=storybook
+            BASE_URL=${{ secrets.BASE_URL }}
+          ALIAS_DOMAINS: |
+            https://${{ inputs.isPreview && '' || 'storybook.' }}${{ vars.APP_DOMAIN }}
+
+      - name: Health check the deployed service URL
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: ${{steps.deploy-vercel.outputs.PREVIEW_URL}}
+          follow-redirect: false
+          max-attempts: 3
+          retry-delay: 5s
+          retry-all: false

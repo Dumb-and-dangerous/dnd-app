@@ -13,7 +13,8 @@
     "pre-commit": "npm run type-check && npm run lint",
     "prepare": "husky install",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "serve-storybook": "serve storybook-static"
   },
   "dependencies": {
     "@chakra-ui/next-js": "^2.1.5",
@@ -54,3 +55,4 @@
     "storybook": "^7.4.4"
   }
 }
+

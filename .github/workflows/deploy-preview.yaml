@@ -18,4 +18,9 @@ jobs:
     secrets: inherit
     with:
       environment: develop
-
+  deploy-storybook:
+    uses: ./.github/workflows/deploy-storybook.yaml
+    needs: [check-and-test]
+    secrets: inherit
+    with:
+      isPreview: true

@@ -19,4 +19,7 @@ jobs:
     with:
       environment: develop
       domain: dev.
-
+  deploy-storybook:
+    uses: ./.github/workflows/deploy-storybook.yaml
+    needs: [check-and-test]
+    secrets: inherit
