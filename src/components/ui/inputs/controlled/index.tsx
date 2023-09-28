@@ -13,17 +13,24 @@ import { ControlledInputProps } from './types';
 export default function ControlledInput<FormValues extends FieldValues>(
   props: ControlledInputProps<FormValues>
 ) {
-  const { control, name, ...rest } = props;
-  const { field, fieldState } = useController({ control, name });
+  const { control, name, rules, defaultValue, shouldUnregister, ...rest } =
+    props;
+  const { field, fieldState } = useController({
+    control,
+    name,
+    rules,
+    defaultValue,
+    shouldUnregister,
+    disabled: rest.disabled,
+  });
 
   return (
-    <FormControl isInvalid={fieldState.error?.message === ''}>
+    <FormControl isInvalid={fieldState.invalid}>
       <FormLabel htmlFor={field.name}>{props.label}</FormLabel>
       <Input id={field.name} {...field} {...rest} />
       <FormErrorMessage>
-        {fieldState.error?.message && fieldState.error?.message}
+        {fieldState.invalid && fieldState.error?.message}
       </FormErrorMessage>
     </FormControl>
   );
 }
-

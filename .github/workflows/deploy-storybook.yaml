@@ -1,0 +1,82 @@
+name: Deploy storybook
+
+on:
+  workflow_call:
+    inputs:
+      isPreview:
+        required: false
+        type: boolean
+        default: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v3
+
+      - name: Get changed files in the docs folder
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v39
+        with:
+          files: src/**/*.stories.{js,jsx,mjs,ts,tsx}
+
+      - name: Create vercel storybook file
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
+        run: |
+          touch vercel.json
+          echo '{
+            "$schema": "https://openapi.vercel.sh/vercel.json",
+            "buildCommand": "npm run build-storybook",
+            "devCommand": "npm run storybook",
+            "installCommand": "npm install",
+            "framework": null,
+            "outputDirectory": "./storybook-static"
+          }' >> vercel.json
+
+      - name: Deploy to Vercel Action
+        id: storybook-vercel-deploy
+        uses: BetaHuhn/deploy-to-vercel-action@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_SCOPE: ${{ secrets.VERCEL_TEAM_NAME }}
+          PRODUCTION: false
+          BUILD_ENV: |
+            SHOW_ENV=storybook
+            BASE_URL=${{ secrets.BASE_URL }}
+          PR_PREVIEW_DOMAIN: 'storybook-{REPO}-{PR}.${{ vars.APP_DOMAIN }}'
+          ALIAS_DOMAINS: https://storybook.${{ vars.APP_DOMAIN }}
+          CREATE_COMMENT: false
+          DELETE_EXISTING_COMMENT: false
+
+      - uses: phulsechinmay/rewritable-pr-comment@v0.3.0
+        if: ${{ steps.storybook-vercel-deploy.outputs.DEPLOYMENT_CREATED }}
+        with:
+          message: |
+            This pull request has been deployed to Vercel.
+
+            <table>
+              <tr>
+                <td><strong>✅ Storybook preview:</strong></td>
+                <td><a href='${{ steps.storybook-vercel-deploy.outputs.PREVIEW_URL }}'>${{ steps.storybook-vercel-deploy.outputs.PREVIEW_URL }}</a></td>
+              </tr>
+              <tr>
+                <td><strong>🔍 Inspect:</strong></td>
+                <td><a href='${{ steps.storybook-vercel-deploy.outputs.DEPLOYMENT_INSPECTOR_URL }}'>${{ steps.storybook-vercel-deploy.outputs.DEPLOYMENT_INSPECTOR_URL }}</a></td>
+              </tr>
+            </table>
+
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          COMMENT_IDENTIFIER: 'storybook-vercel-deploy'
+
+      - name: Health check the deployed service URL
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: ${{steps.storybook-vercel-deploy.outputs.PREVIEW_URL}}
+          follow-redirect: false
+          max-attempts: 3
+          retry-delay: 5s
+          retry-all: false
