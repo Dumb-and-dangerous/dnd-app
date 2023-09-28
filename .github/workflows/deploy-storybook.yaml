@@ -26,14 +26,14 @@ jobs:
         if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: |
           touch vercel.json
-          echo | {
+          echo '{
             "$schema": "https://openapi.vercel.sh/vercel.json",
             "buildCommand": "npm run build-storybook",
             "devCommand": "npm run storybook",
             "installCommand": "npm install",
             "framework": null,
             "outputDirectory": "./storybook-static"
-          } >> vercel.json
+          }' >> vercel.json
 
           echo "cat vercel.json"
           cat vercel.json
@@ -59,6 +59,27 @@ jobs:
             BASE_URL=${{ secrets.BASE_URL }}
           ALIAS_DOMAINS: |
             https://${{ inputs.isPreview && '' || 'storybook.' }}${{ vars.APP_DOMAIN }}
+          CREATE_COMMENT: false
+
+      - name: Create comment
+        uses: phulsechinmay/rewritable-pr-comment@v0.3.0
+        if: ${{ steps.vercel-deploy.outputs.DEPLOYMENT_CREATED && inputs.isPreview }}
+        with:
+          message: |
+            This pull request has been deployed to Vercel.
+
+            <table>
+              <tr>
+                <td><strong>✅ Storybook Preview:</strong></td>
+                <td><a href='${{ steps.vercel-deploy.outputs.PREVIEW_URL }}'>${{ steps.vercel-deploy.outputs.PREVIEW_URL }}</a></td>
+              </tr>
+              <tr>
+                <td><strong>🔍 Inspect:</strong></td>
+                <td><a href='${{ steps.vercel-deploy.outputs.DEPLOYMENT_INSPECTOR_URL }}'>${{ steps.vercel-deploy.outputs.DEPLOYMENT_INSPECTOR_URL }}</a></td>
+              </tr>
+            </table>
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          COMMENT_IDENTIFIER: 'vercel-deploy'
 
       - name: Health check the deployed service URL
         uses: jtalk/url-health-check-action@v3
